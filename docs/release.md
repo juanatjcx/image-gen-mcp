@@ -26,7 +26,8 @@ dependency installation. This is distinct from the local warm-cache check.
 Consult the PR/current commit checks for subsequent candidates; an earlier green
 run is not proof for a different commit. Jobs have read-only repository permission, no Azure credentials,
 `IMAGE_GEN_LIVE=false`, no publishing step and no image-generation requests.
-There is deliberately no automatic live or publishing workflow. npm access for
+There is deliberately no automatic live or publishing workflow. The separate
+manual release workflow below is the only publishing route. npm access for
 dependencies/audit is expected; "offline" refers to image-provider tests, not a
 general network sandbox.
 
@@ -83,3 +84,40 @@ building or merging. An authorized maintainer must:
 Until those steps have evidence, use the reviewed source or a locally verified
 tarball. Once a registry release exists, client commands must pin the verified
 version rather than an unbounded `latest`.
+
+## Guarded first-publication workflow
+
+`Manual verified npm release` is available only through an explicit
+`workflow_dispatch` on `main`. It is restricted to `0.1.0` of
+`@juanmicrosoft/image-gen-mcp`; it is not general automatic release tooling.
+Supply the reviewed source SHA, its successful main `Offline verification`
+run ID and the independently inspected Ubuntu tarball's SHA-256.
+
+The workflow verifies the run's repository, event, workflow path, branch, SHA
+and conclusion, then checks the downloaded archive's hash, package identity
+and allowed inventory. It publishes that archive without repacking or running
+lifecycle scripts. A version lookup must return exactly 404; network errors
+or an already published version fail closed. The npm CLI is checked as 10.9.7
+under pinned Node 22.22.2.
+
+The user supplies `NPM_TOKEN` directly as an encrypted repository Actions
+secret. It is exposed only to the explicit publishing step, after dependency
+installation and artifact verification. The first-release token needs scoped
+publishing permission and per-token 2FA bypass; this does not change account
+2FA. The user reported a seven-day expiry. Revoke the token in npm and delete
+the GitHub secret immediately after use rather than waiting for expiration.
+Never echo a token, put it in workflow inputs or commit it in configuration.
+
+The publish step checks the authenticated npm username and submits once with
+fetch retries disabled. A transport failure can still mean publication occurred:
+inspect registry metadata before another dispatch. After successful submission,
+a token-free step anonymously fetches the version and tarball, compares SHA-256
+and registry integrity, installs the exact registry version into a fresh prefix
+with scripts disabled, and checks MCP version/discovery. It makes no Azure
+image request and does not claim a new live client/model certification.
+
+Staged publishing was considered, but
+[npm 12.1.0 documentation](https://github.com/npm/cli/blob/c039090578a5b21a1aa3aba9c96e199feaf1823a/docs/lib/content/commands/npm-stage.md)
+requires the package to exist first. No dummy package/version is created to
+bypass that prerequisite. Future OIDC or staged publishing is separate work.
+The manual workflow's existence alone is not evidence of a published version.
