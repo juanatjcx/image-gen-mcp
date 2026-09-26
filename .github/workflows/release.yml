@@ -1,0 +1,77 @@
+name: Manual verified npm release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Independently reviewed main commit (40-character SHA)
+        required: true
+      verification_run:
+        description: Successful main Offline verification run ID for that commit
+        required: true
+      tarball_sha256:
+        description: Independently reviewed Ubuntu package SHA-256
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: npm-first-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMAGE_GEN_LIVE: "false"
+      RELEASE_SHA: ${{ inputs.source_sha }}
+      RELEASE_HASH: ${{ inputs.tarball_sha256 }}
+      VERIFICATION_RUN: ${{ inputs.verification_run }}
+      RELEASE_DIRECTORY: ${{ runner.temp }}/reviewed-package
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+      NPM_CONFIG_FETCH_RETRIES: "0"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.22.2
+          registry-url: https://registry.npmjs.org/
+      - name: Download and validate exact CI artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$VERIFICATION_RUN" =~ ^[1-9][0-9]{0,19}$ ]]
+          gh run download "$VERIFICATION_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name package-ubuntu-latest --dir "$RELEASE_DIRECTORY"
+          node scripts/prepare-release.mjs
+      - name: Prepare verification dependencies without publishing credentials
+        run: |
+          set -euo pipefail
+          test "$(npm --version)" = "10.9.7"
+          npm ci --ignore-scripts --no-audit --no-fund
+      - name: Refuse an existing version or ambiguous registry response
+        run: |
+          node --input-type=module -e '
+            const r = await fetch("https://registry.npmjs.org/@juanmicrosoft%2fimage-gen-mcp/0.1.0", {
+              redirect: "error", signal: AbortSignal.timeout(15000)
+            });
+            if (r.status !== 404) throw new Error(`Expected absent version (404), received ${r.status}. Inspect before resubmission.`);
+          '
+      - name: Publish reviewed tarball once
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$NODE_AUTH_TOKEN"
+          test "$(npm whoami --registry=https://registry.npmjs.org/)" = "juanmicrosoft"
+          npm publish "$RELEASE_DIRECTORY/release.tgz" --ignore-scripts \
+            --access public --tag latest --registry=https://registry.npmjs.org/
+      - name: Verify anonymous registry artifact and fresh installation
+        run: node scripts/verify-registry.mjs
