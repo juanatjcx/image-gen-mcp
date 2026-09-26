@@ -17,6 +17,14 @@ const valid = () => ({
     head_repository: { full_name: repository }, repository: { full_name: repository } },
 });
 
+test("release runner path is initialized at step execution, not unsupported job-level context", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
+  const jobConfiguration = workflow.split("    steps:")[0];
+  assert.doesNotMatch(jobConfiguration, /\$\{\{\s*runner\./);
+  assert.match(workflow, /export RELEASE_DIRECTORY="\$RUNNER_TEMP\/reviewed-package"/);
+  assert.match(workflow, /printf 'RELEASE_DIRECTORY=%s\\n' "\$RELEASE_DIRECTORY" >> "\$GITHUB_ENV"/);
+});
+
 test("preparation rejects archive and evidence mutations before copying, and preserves exact valid bytes",
   { skip: process.platform === "win32" }, async (t) => {
     const root = await mkdtemp(join(tmpdir(), "release-preparation-"));

@@ -31,7 +31,6 @@ jobs:
       RELEASE_SHA: ${{ inputs.source_sha }}
       RELEASE_HASH: ${{ inputs.tarball_sha256 }}
       VERIFICATION_RUN: ${{ inputs.verification_run }}
-      RELEASE_DIRECTORY: ${{ runner.temp }}/reviewed-package
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
       NPM_CONFIG_FETCH_RETRIES: "0"
     steps:
@@ -47,6 +46,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          export RELEASE_DIRECTORY="$RUNNER_TEMP/reviewed-package"
+          printf 'RELEASE_DIRECTORY=%s\n' "$RELEASE_DIRECTORY" >> "$GITHUB_ENV"
           [[ "$VERIFICATION_RUN" =~ ^[1-9][0-9]{0,19}$ ]]
           gh run download "$VERIFICATION_RUN" --repo "$GITHUB_REPOSITORY" \
             --name package-ubuntu-latest --dir "$RELEASE_DIRECTORY"
