@@ -1,10 +1,13 @@
 # Local package verification and support boundaries
 
-Registry publication is **not verified**. The local package is named
-`@juanmicrosoft/image-gen-mcp`, version `0.1.0`; that metadata is not evidence of
-npm scope ownership or publication. `npm whoami` returned `ENEEDAUTH`, and later
-registry lookups failed with connection/TLS errors. Do not install an assumed
-public version in place of the reviewed source/tarball.
+`@juanmicrosoft/image-gen-mcp@0.1.0` is published. Anonymous archive integrity,
+fresh public-registry installation and four-tool MCP discovery passed in
+[run 36319308717](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36319308717).
+Use the pinned registry install in the [README](../README.md) and the included
+helper in [setup](setup.md). The [release record](release.md) distinguishes the
+published source/archive from later documentation changes and retains initial
+availability failures. Local direct-registry connectivity remains unavailable;
+hosted Ubuntu verification does not certify every client/platform.
 
 From a source checkout with dependencies installed:
 

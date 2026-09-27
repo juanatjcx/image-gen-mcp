@@ -6,10 +6,10 @@ is `gpt-image-2.5-sunburst`; an arbitrary deployment **alias** does not prove it
 model. Obtain the correct model/version and endpoint from the resource owner.
 Do not create a Foundry project just to obtain an inference resource URL.
 
-Build the source checkout using the README commands. No Azure credentials are
-needed to install/build or run offline tests. Registry installation is not yet
-verified; use the source route or a separately validated local tarball rather
-than assuming the package/version is available.
+Install the pinned registry release or build the source checkout using the
+README commands. No Azure credentials are needed to install/build or run
+offline tests. [Registry installation and discovery](release.md) passed on
+hosted Ubuntu with Node 22.22.2; this is not a new live-client qualification.
 
 ## 1. Select configuration, not a resource-management workflow
 
@@ -54,10 +54,17 @@ Do not paste the key into a command, chat or committed JSON file.
 
 ## 2. Create a private, session-local CLI configuration
 
-For CLI mode:
+For CLI mode from a source checkout:
 
 ```sh
 node scripts/configure-client.mjs --output "$HOME/.config/image-gen-mcp/copilot.mcp.json"
+```
+
+For the registry installation prefix used in the README, use the included helper:
+
+```sh
+node "$HOME/.local/share/image-gen-mcp/node_modules/@juanmicrosoft/image-gen-mcp/scripts/configure-client.mjs" \
+  --output "$HOME/.config/image-gen-mcp/copilot.mcp.json"
 ```
 
 For API-key mode, the helper requires an explicit plaintext-storage acknowledgment:
@@ -67,6 +74,9 @@ node scripts/configure-client.mjs --output "$HOME/.config/image-gen-mcp/copilot.
   --allow-plaintext-key
 unset AZURE_OPENAI_API_KEY
 ```
+
+For registry installs, substitute the installed helper path above and retain
+the same `--allow-plaintext-key` acknowledgment.
 
 The helper writes only selected runtime settings, uses an exclusive 0600 file
 and never overwrites existing client configuration or registers globally. The

@@ -8,8 +8,14 @@ Anonymous version metadata and archive retrieval passed, including the reviewed
 SHA-256 `fdafc22dc994edb23af7011cfad77e41a10f04bbd6d5c87a872fd7dd25a5e010`
 and registry SHA-512 integrity. The subsequent fresh registry install returned
 404 for package-level metadata. Propagation delay is a hypothesis, not a proven
-cause. **Fresh registry installation remains unverified.** Do not republish.
-Issues #77/#73/#30 remain open for read-only recovery and remaining acceptance.
+cause. Verification-only runs at 12:26 and 12:27 UTC also returned 404.
+At 12:32 UTC, [run 36319308717](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36319308717)
+passed anonymous metadata/archive/hash/integrity, fresh pinned registry install,
+installed package/server version agreement, all four tools and nonbillable
+diagnostics with inference unverified. No image request or republish occurred.
+Installability was therefore verified after the initial availability failures.
+[npm documents publish-time scanning delays](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/);
+the package's exact internal scan state was not observed.
 
 The publishing GitHub secret was deleted after submission. npm token revocation
 has not yet been verified; deleting the GitHub secret does not revoke the token.
@@ -18,7 +24,22 @@ replacement credential allowed the successful submission recorded above.
 
 The repository is public and the code/documentation are MIT licensed. Service
 terms and rights in generated/reference images remain separate. Do not replace
-source setup with an assumed `npx` version.
+source setup with an unpinned `npx` version.
+
+### Immutable release identity
+
+- Published source: `023a1d638baa28bb23200c60998ad3ce34695a1b`.
+- Exact-source offline CI: [36276966743](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36276966743);
+  its Ubuntu artifact contains 72 files and matches the SHA-256 above.
+- Publication: [36318817232](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36318817232).
+- Verification-only source: `f5598c78fc4552f1314d61df1658f05848e61e79`;
+  this later commit adds recovery tooling/documentation, not new published bytes.
+- Registry package: <https://www.npmjs.com/package/@juanmicrosoft/image-gen-mcp/v/0.1.0>.
+
+The version tag must point to the published source, not a later documentation
+commit. The immutable archive includes the pre-publication documentation;
+this repository record and the version's release notes supersede that historical
+status text. Do not rebuild later source and claim it is the same archive.
 
 ## Verification pipeline
 
@@ -68,7 +89,7 @@ The former packed edit remains unknown. Separate data-only generation/editing,
 authenticated ARM denial and temporary authorization cleanup are now recorded.
 Live expired-session testing was explicitly removed from the v1 completion gate,
 not declared passed; conservative diagnostics and their limits remain documented.
-The published version still awaits fresh registry-install verification.
+The published version has fresh hosted-Ubuntu registry-install verification.
 This is not an all-platform certification.
 
 ## Authorized publication checklist
@@ -90,9 +111,9 @@ building or merging. An authorized maintainer must:
    repeat discovery and the approved client acceptance. Link the registry
    version, run, checksum and limitations before tagging/announcing a release.
 
-Until those steps have evidence, use the reviewed source or a locally verified
-tarball. Once a registry release exists, client commands must pin the verified
-version rather than an unbounded `latest`.
+Those publication and registry-install steps now have the evidence above.
+Client commands must pin `@juanmicrosoft/image-gen-mcp@0.1.0` rather than an
+unbounded `latest`. Credential cleanup remains distinct and unfinished.
 
 ## Guarded first-publication workflow
 
