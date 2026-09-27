@@ -99,16 +99,30 @@ the **source checkout**, not the npm runtime package.
 
 ### 2. Ask the agent to connect your client
 
-Replace the bracketed choice with **Copilot CLI**, **VS Code Copilot**, or
-**Claude Code**:
+Paste this into the same local agent conversation; no client-name substitution
+is needed:
 
 ```text
-Connect image-gen-mcp to [Copilot CLI / VS Code Copilot / Claude Code] on this
-machine, using the Azure configuration from the previous step.
+Connect image-gen-mcp to the coding-agent application hosting this
+conversation, using the Azure configuration from the previous step.
 
-Install @juanmicrosoft/image-gen-mcp@0.1.0 from https://registry.npmjs.org/
-with --ignore-scripts in a persistent local prefix. Use an absolute installed
-entrypoint and the correct client-specific format in docs/clients.md.
+Identify the host application and use its supported MCP configuration format
+and registration method. Configure only this host, not every installed client.
+Do not infer the host from the AI model name: a Claude model inside Copilot
+still needs Copilot configuration. If the host is ambiguous, unsupported by
+this guide, or its configuration is inaccessible, ask me before changing it.
+
+Use the latest release of @juanmicrosoft/image-gen-mcp available from the
+public npm registry at setup time. Resolve its latest tag with:
+npm view @juanmicrosoft/image-gen-mcp dist-tags.latest --registry=https://registry.npmjs.org/
+Report the exact version returned and check that version's release notes,
+Node requirements and setup compatibility. If lookup fails or compatibility
+is unclear, stop and explain rather than guessing a version or downgrading.
+Install that exact resolved version with --ignore-scripts in a persistent
+local prefix. Do not use a floating @latest command in the MCP launcher or
+silently upgrade an existing installation; ask before replacing it.
+Use an absolute installed entrypoint and the correct client-specific format
+in docs/clients.md, adjusted only for documented changes in the chosen release.
 Use IMAGE_GEN_AUTH=azure-cli, IMAGE_GEN_PREVIEW=false and an absolute private
 output directory; do not pass AZURE_OPENAI_API_KEY in CLI-auth mode.
 Pass the endpoint, deployment and any explicit tenant.
@@ -135,6 +149,10 @@ Do not request an image or automatically approve billable tools.
 ```
 
 The [client guide](docs/clients.md) includes concrete configuration commands.
+This prompt selects the latest release once, then pins the resolved version for
+installation; starting the MCP does not trigger automatic upgrades. The manual
+example below remains pinned to the verified `0.1.0` release. Its qualification
+evidence does not certify future package versions.
 There is no MCP OAuth login here: the local server uses the Azure CLI identity
 you authorized. Valid configuration or a working `az login` is **not** proof of
 inference permission.
