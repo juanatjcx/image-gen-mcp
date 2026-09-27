@@ -1,11 +1,20 @@
 # Release candidate and evidence index
 
-## Status — 2026-09-25 UTC
+## Status — 2026-09-27 UTC
 
-`0.1.0` is a source/tarball candidate, **not a verified published npm version**.
-`npm whoami` returned `ENEEDAUTH`; subsequent local registry reads failed with
-connection/TLS errors. Neither scope ownership nor name availability is proved.
-Issue #30 stays open pending registry authorization and installation evidence.
+`@juanmicrosoft/image-gen-mcp@0.1.0` was published by
+[run 36318817232](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36318817232).
+Anonymous version metadata and archive retrieval passed, including the reviewed
+SHA-256 `fdafc22dc994edb23af7011cfad77e41a10f04bbd6d5c87a872fd7dd25a5e010`
+and registry SHA-512 integrity. The subsequent fresh registry install returned
+404 for package-level metadata. Propagation delay is a hypothesis, not a proven
+cause. **Fresh registry installation remains unverified.** Do not republish.
+Issues #77/#73/#30 remain open for read-only recovery and remaining acceptance.
+
+The publishing GitHub secret was deleted after submission. npm token revocation
+has not yet been verified; deleting the GitHub secret does not revoke the token.
+Earlier attempts failed with local connectivity errors and npm `EOTP`; the
+replacement credential allowed the successful submission recorded above.
 
 The repository is public and the code/documentation are MIT licensed. Service
 terms and rights in generated/reference images remain separate. Do not replace
@@ -59,12 +68,12 @@ The former packed edit remains unknown. Separate data-only generation/editing,
 authenticated ARM denial and temporary authorization cleanup are now recorded.
 Live expired-session testing was explicitly removed from the v1 completion gate,
 not declared passed; conservative diagnostics and their limits remain documented.
-Registry publication remains open.
-This is not a published release or an all-platform certification.
+The published version still awaits fresh registry-install verification.
+This is not an all-platform certification.
 
 ## Authorized publication checklist
 
-Publishing is a separate, currently blocked operation, not a side effect of
+Publishing is a separate, explicit operation, not a side effect of
 building or merging. An authorized maintainer must:
 
 1. Resolve remaining release gates or explicitly scope a separately tracked
@@ -121,3 +130,14 @@ Staged publishing was considered, but
 requires the package to exist first. No dummy package/version is created to
 bypass that prerequisite. Future OIDC or staged publishing is separate work.
 The manual workflow's existence alone is not evidence of a published version.
+
+## Read-only verification recovery
+
+After a successful publish followed by a failed verification, never rerun the
+publishing workflow. `Manual published registry verification`
+(`verify-registry.yml`) is a separate, manual, main-only workflow with read-only
+repository permissions and no publishing credentials. It runs the existing
+anonymous metadata/archive/integrity and fresh installation/MCP discovery checks
+against the fixed reviewed `0.1.0` archive hash above. It neither republishes nor
+requests images, and a failed check remains a failure without automatic retries.
+Record its actual run before claiming registry installation is verified.
