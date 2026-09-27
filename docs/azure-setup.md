@@ -1,5 +1,17 @@
 # Isolated Azure deployment
 
+For an agent-driven experience, paste the [README setup prompts](../README.md#get-started)
+into your local coding agent. It can run the commands below through Azure CLI;
+no Azure portal resource setup is required. You still complete interactive
+sign-in and explicitly approve the subscription, topology/costs and permission
+changes. Missing model access/quota or role-assignment rights requires the
+resource owner/administrator; automation cannot bypass those gates.
+
+Provisioning uses `scripts/azure.mjs` and `infra/main.bicep` from a trusted source
+checkout. They are intentionally not shipped as npm runtime commands. The
+script's default CLI-auth provisioning path expects an interactive Entra user
+(`az ad signed-in-user show`), not a service-principal login.
+
 Requires Azure CLI, Bicep and a signed-in Entra user. The identity needs resource
 creation/deployment permissions and permission to assign the resource-scoped
 **Cognitive Services OpenAI User** role. That built-in role includes management
