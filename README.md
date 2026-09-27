@@ -8,7 +8,9 @@ A local Model Context Protocol (MCP) server for generating and editing images
 through your own Azure Foundry deployment, with GitHub Copilot and editable
 presentation workflows.
 
-**Status: source-build preview, not a published npm release.** The implemented
+**Status: `@juanmicrosoft/image-gen-mcp@0.1.0` is published.** Anonymous archive
+integrity, fresh registry installation and MCP discovery are
+[verified](docs/release.md). The implemented
 tools have [real Azure evidence](docs/evidence/azure-contract.md),
 [actual Copilot CLI evidence](docs/evidence/copilot-cli.md) and a
 [rendered presentation example](docs/evidence/presentation.md).
@@ -21,8 +23,8 @@ See the [qualification matrix and boundaries](docs/evidence/client-qualification
 A separate [data-only Azure principal](docs/evidence/data-only-authentication.md)
 also generated and edited while an authenticated management read was denied.
 Live expired-session behavior remains unverified; ambiguous diagnostics do not
-claim a unique cause. npm publication remains an
-[open gate](https://github.com/juanmicrosoft/image-gen-mcp/milestone/1).
+claim a unique cause. Publishing-token revocation remains an
+[open cleanup gate](https://github.com/juanmicrosoft/image-gen-mcp/issues/73).
 
 The configured model profile is `gpt-image-2.5-sunburst`. V1 deliberately enables
 only the live-verified **1536x864, high-quality PNG** combination: one image,
@@ -40,6 +42,16 @@ fallback. No exact ChatGPT backend or output parity is claimed.
 
 For an existing compatible deployment:
 
+Install the pinned release in a persistent directory:
+
+```sh
+npm install --prefix "$HOME/.local/share/image-gen-mcp" \
+  --registry=https://registry.npmjs.org/ --ignore-scripts --no-audit --no-fund \
+  @juanmicrosoft/image-gen-mcp@0.1.0
+```
+
+Or build from source:
+
 ```sh
 git clone https://github.com/juanmicrosoft/image-gen-mcp.git
 cd image-gen-mcp
@@ -49,8 +61,8 @@ npm run build
 
 Then follow [existing-deployment setup](docs/setup.md) to select credentials,
 set the inference endpoint/deployment/output directory, and create a private
-client configuration. Do not use an unpublished `npx` package or paste a key
-into shell history. The server is a stdio protocol process, not an interactive
+client configuration. Pin the package version and never paste a key into
+shell history. The server is a stdio protocol process, not an interactive
 image-generation command.
 
 Starting from scratch? Use the separate [owner-tagged Bicep/Azure CLI setup](docs/azure-setup.md).
@@ -79,8 +91,8 @@ was free; retain the operation ID and inspect it before explicitly submitting ag
 For contributors, `npm test` is offline and requires no Azure credentials.
 See [testing](docs/testing.md), [CONTRIBUTING.md](CONTRIBUTING.md) and
 [AGENTS.md](AGENTS.md) for the individual-PR, independent-review and evidence rules.
-The [candidate changelog](CHANGELOG.md) and [release evidence/gates](docs/release.md)
-separate passed offline/package CI from unresolved live-client and publication acceptance.
+The [changelog](CHANGELOG.md) and [release evidence/gates](docs/release.md)
+separate registry verification from bounded live-client evidence and remaining cleanup.
 
 The software and documentation are [MIT licensed](LICENSE). See
 [SECURITY.md](SECURITY.md). This license

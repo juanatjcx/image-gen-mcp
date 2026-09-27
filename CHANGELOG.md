@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 candidate — unpublished
+## 0.1.0 — 2026-09-27
 
 MIT-licensed local stdio MCP with explicit Azure CLI/API-key authentication,
 truthful nonbillable diagnostics, image generation, explicit-reference editing,
@@ -25,5 +25,8 @@ An [isolated data-only principal](docs/evidence/data-only-authentication.md)
 also generated/edited with management read denied. Live expired-session
 behavior remains unverified and is explicitly outside the revised v1 acceptance
 gate; recognized diagnostic signals are not exhaustive root-cause diagnosis.
-Registry publication remains unresolved. Metadata
-version `0.1.0` is not a publication announcement.
+Anonymous published-archive integrity, fresh registry installation and MCP
+discovery passed in [run 36319308717](https://github.com/juanmicrosoft/image-gen-mcp/actions/runs/36319308717).
+Published source: `023a1d638baa28bb23200c60998ad3ce34695a1b`.
+Later documentation updates do not change the immutable published archive.
+The GitHub publishing secret was removed; npm token revocation is still pending.
