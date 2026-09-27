@@ -25,6 +25,19 @@ test("release runner path is initialized at step execution, not unsupported job-
   assert.match(workflow, /printf 'RELEASE_DIRECTORY=%s\\n' "\$RELEASE_DIRECTORY" >> "\$GITHUB_ENV"/);
 });
 
+test("registry recovery workflow is manual, main-only and credential-free", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/verify-registry.yml", import.meta.url), "utf8");
+  assert.match(workflow, /on:\n  workflow_dispatch:\n/);
+  assert.match(workflow, /permissions:\n  contents: read\n/);
+  assert.match(workflow, /if: github.ref == 'refs\/heads\/main'/);
+  assert.match(workflow, /persist-credentials: false/);
+  assert.match(workflow, /RELEASE_HASH: fdafc22dc994edb23af7011cfad77e41a10f04bbd6d5c87a872fd7dd25a5e010/);
+  assert.match(workflow, /run: node scripts\/verify-registry.mjs/);
+  assert.doesNotMatch(workflow, /secrets\.|NODE_AUTH_TOKEN|npm publish|write-all|: write|pull_request:|push:/);
+  assert.ok([...workflow.matchAll(/uses: ([^\n]+)/g)]
+    .every(([, action]) => /^actions\/[^@]+@[a-f0-9]{40}(?: #.*)?$/.test(action)));
+});
+
 test("preparation rejects archive and evidence mutations before copying, and preserves exact valid bytes",
   { skip: process.platform === "win32" }, async (t) => {
     const root = await mkdtemp(join(tmpdir(), "release-preparation-"));
