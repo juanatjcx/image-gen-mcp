@@ -64,6 +64,26 @@ below; do not require me to paste another setup prompt. Pause for sign-in,
 required choices, explicit approvals or blockers, then continue after they
 are resolved. This prompt does not authorize resource changes or paid images.
 
+Use ordinary conversation replies for decisions where the host permits them.
+Present the current stage, exact values and short numbered reply options, then
+end the turn awaiting my reply. Use forms only when required by host policy or
+known to support replies here. If a form reports me unavailable, do not keep
+calling it: show text options if permitted, otherwise report the host limitation.
+On my next message, accept an unambiguous answer to the pending decision and
+resume, without requiring the original prompt again. A confirmation wait is
+an incomplete checkpoint, not successful setup. If the host must terminate a
+task, preserve the checkpoint and report "setup incomplete; awaiting reply"
+or "awaiting restart"; do not claim the overall setup is complete.
+Never override the host's mandatory approval or task-lifecycle rules.
+
+Maintain a private setup-progress checkpoint as described in docs/setup.md,
+separate from the provisioning ownership-state file. Preserve stage, pending
+decision, confirmed scope, proposed plan, completed checks and their timestamps,
+installation/activation status and actual approval references across turns.
+Reuse completed read-only checks unless relevant inputs or time-sensitive data
+changed. Revalidate identity/scope and volatile feasibility before writes.
+Never treat checkpoint text alone as authorization or proof a write succeeded.
+
 1. Prepare the environment and Azure plan.
 
 Use an isolated private checkout, verify
@@ -93,8 +113,16 @@ and tenant. If I need another one, summarize counts by tenant and show a
 small filtered selection; do not dump the full subscription inventory.
 If sign-in is needed, start az login and let me complete it; never ask me to
 paste credentials into chat.
-Ask me to choose/confirm the tenant and subscription, and whether to reuse
-an existing compatible image deployment or create a dedicated new one.
+The first decision is only tenant/subscription confirmation and new deployment
+versus reuse. After displaying the exact tenant and subscription, accept a
+short reply such as "New deployment; confirmed" or "Reuse; confirmed" as that
+choice, authorizing read-only feasibility only, NOT resource creation or roles.
+Ask for reuse endpoint/alias details before inspecting that resource.
+Useful read-only identity/provider/model/quota/pricing/RBAC checks may run
+before this choice against the displayed current subscription, if authorized.
+Do not enumerate other subscriptions or assume those results apply after a
+scope change. If the user already supplied an unambiguous scope and path
+choice, reuse it instead of repeating this decision.
 Use supported commands from the installed az version. For missing read-only
 checks, az rest may use an official documented ARM endpoint and API version;
 cite the documentation rather than guessing commands or undocumented endpoints.
@@ -120,14 +148,20 @@ If access/quota is blocked, report the exact blocker and required admin action.
 Present one consolidated approval gate after read-only feasibility, listing
 the exact tenant/subscription, runtime principal, region/model/SKU, resource
 names, topology/costs, role and resource scope, provider registration if needed,
-and absolute state path. If runtime installation is blocked, disclose that
-before requesting approval to create resources that cannot yet be used.
+and absolute state path. This is a second, distinct authorization to write;
+the earlier new/reuse choice never substitutes for it.
+If npm connectivity blocks runtime installation, default to waiting before
+provisioning. I may explicitly choose to provision anyway: the final write
+approval must acknowledge creating resources with possible costs that this
+MCP cannot yet use. Keep runtime installation blocked; that approval neither
+bypasses network controls nor authorizes package-source changes.
 Include a one-line approval statement with these actual values and precisely
-the proposed writes. If a confirmation form cannot be delivered or reports me
-unavailable, display that statement and stop; wait for my explicit reply.
+the proposed writes (and blocked-install risk if applicable). Accept that
+explicit approval in the next conversation turn, subject to host policy.
 Account switching, a retry request, silence or an unavailable form is not
 approval. Do not create resources, register providers, assign roles or write
-ownership state before approval. Reconfirm if the approved plan changes.
+ownership state before approval. The separate setup-progress checkpoint may
+record read-only progress before approval. Reconfirm if the approved plan changes.
 
 Keep ownership state for recovery/cleanup, including after partial failure.
 Never delete/adopt unrelated resources or reset state to bypass ownership.
@@ -178,6 +212,13 @@ explicit environment variables and the installed executable; do not copy
 Copilot-only tools/timeout fields into Claude configuration.
 
 Reload/restart the host as needed; show me the exact launch or reload step.
+Do not assume this running agent can reload its own MCP tool inventory.
+For a session-local Copilot CLI config, give the exact new-process command
+with --additional-mcp-config and the applicable resume option. Checkpoint as
+awaiting restart, with verification still pending; let me restart/resume.
+In the resumed host, read the checkpoint and continue discovery rather than
+reprovisioning or repeating configuration. If session history cannot be
+resumed, give a short resume instruction with the private checkpoint path.
 Verify that this client discovers get_capabilities, generate_image,
 edit_image and get_operation. Call only get_capabilities and explain any
 unverified inference/permission checks. If you cannot inspect the client
@@ -191,7 +232,8 @@ with inference still unverified. Ask whether I approve at most one billable
 generation request through the configured image-gen deployment. Show the
 proposed image brief and charge warning before asking. If I decline, finish
 without images. If the approval form is unavailable, provide the exact reply
-needed and stop; silence or pasting this setup prompt is not approval.
+needed where host policy permits, save the pending decision and end the turn.
+Resume from my explicit reply; silence or pasting this setup prompt is not approval.
 
 Unless I choose a different brief before approval, propose a
 1536x864 high-quality PNG of a lighthouse on a quiet rocky coast at dawn,
@@ -210,7 +252,18 @@ blocked or unverified step as completed.
 
 ### What to expect
 
-The agent will pause for your approvals, not for another setup prompt. It can
+The agent will pause for your replies, not for another setup prompt. A short
+new/reuse choice confirms the displayed scope for read-only work; a separate
+precise approval authorizes the final write plan. If npm is unreachable, the
+default is to wait, but you may explicitly approve provisioning despite the
+blocked runtime installation and possible resource costs.
+
+A private checkpoint carries progress across replies and client restarts.
+Hosts may enforce forms or end each task automatically; a prompt cannot change
+those runtime policies. The agent must label the workflow incomplete and provide
+a supported continuation path, not treat a missing reply as approval.
+The [resume guide](docs/setup.md#resuming-a-paused-setup) explains the checkpoint.
+The agent can
 use `az login --use-device-code` when normal interactive login is unavailable.
 Sign-in may open a browser; that is authentication, not portal resource setup.
 Provisioning uses the [ownership-safe source script](docs/azure-setup.md), not
