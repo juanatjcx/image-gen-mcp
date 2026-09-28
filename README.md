@@ -85,7 +85,17 @@ authorizes and excludes, and what you will do immediately afterward.
 Do not merely say "awaiting reply" or bury the request after evidence.
 If a form is unavailable, render the same action block in ordinary output
 where permitted; otherwise clearly state the host-required continuation path.
-Place supporting evidence after the block. End the pause with a truthful,
+Keep routine pauses within 120 words: one brief question/reason, the required
+scope or command, and 2-4 numbered options (prefer 3-4 only when meaningful).
+Each option is a short copyable reply plus one concise consequence; no nested
+bullets. State shared authorization exclusions once, not under every option.
+Do not add progress recaps, tool logs, repeated explanations or unsolicited
+evidence. Save technical detail in the private checkpoint; show it on request.
+Only exact write-plan details, material risks or an accurate uncertain-action
+status may exceed the limit; never omit information needed for informed consent.
+Accept an option number only when it unambiguously selects the saved unchanged
+decision and any required risk acknowledgment, subject to host approval policy.
+End the pause with a truthful,
 scoped "No <pending action> has occurred" status; do not deny prior completed
 actions or claim an uncertain outcome never occurred.
 
