@@ -1,6 +1,6 @@
 # Isolated Azure deployment
 
-For an agent-driven experience, paste the [README setup prompts](../README.md#get-started)
+For an agent-driven experience, paste the [single README setup prompt](../README.md#get-started)
 into your local coding agent. It can run the commands below through Azure CLI;
 no Azure portal resource setup is required. You still complete interactive
 sign-in and explicitly approve the subscription, topology/costs and permission
