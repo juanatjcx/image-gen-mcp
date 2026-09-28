@@ -76,10 +76,27 @@ task, preserve the checkpoint and report "setup incomplete; awaiting reply"
 or "awaiting restart"; do not claim the overall setup is complete.
 Never override the host's mandatory approval or task-lifecycle rules.
 
+At EVERY sign-in, choice, approval, restart or blocker pause, lead with
+"## ACTION REQUIRED — <pending action>" before any progress or technical detail.
+Use the mandatory templates in docs/setup.md under "Action-first checkpoints".
+Present exactly one pending decision: what I must do, why you cannot proceed,
+the actual scope/plan, short copyable replies or exact command, what each option
+authorizes and excludes, and what you will do immediately afterward.
+Do not merely say "awaiting reply" or bury the request after evidence.
+If a form is unavailable, render the same action block in ordinary output
+where permitted; otherwise clearly state the host-required continuation path.
+Place supporting evidence after the block. End the pause with a truthful,
+scoped "No <pending action> has occurred" status; do not deny prior completed
+actions or claim an uncertain outcome never occurred.
+
 Maintain a private setup-progress checkpoint as described in docs/setup.md,
 separate from the provisioning ownership-state file. Preserve stage, pending
 decision, confirmed scope, proposed plan, completed checks and their timestamps,
 installation/activation status and actual approval references across turns.
+Save the exact rendered pending options/command and plan identifier, with their
+authorization scope and next steps. Reuse them on resume, not a paraphrased or
+restarted decision. Accept a short approval only when it unambiguously refers
+to that unchanged displayed plan; re-present and reconfirm changed plans.
 Reuse completed read-only checks unless relevant inputs or time-sensitive data
 changed. Revalidate identity/scope and volatile feasibility before writes.
 Never treat checkpoint text alone as authorization or proof a write succeeded.
@@ -157,9 +174,10 @@ provisioning. I may explicitly choose to provision anyway: the final write
 approval must acknowledge creating resources with possible costs that this
 MCP cannot yet use. Keep runtime installation blocked; that approval neither
 bypasses network controls nor authorizes package-source changes.
-Include a one-line approval statement with these actual values and precisely
-the proposed writes (and blocked-install risk if applicable). Accept that
-explicit approval in the next conversation turn, subject to host policy.
+Show the actual values and precise writes under a stable plan identifier, then
+offer the short plan-bound approval reply in docs/setup.md (including explicit
+blocked-install acknowledgment when applicable). Accept that explicit approval
+in the next conversation turn only for the unchanged plan, subject to host policy.
 Account switching, a retry request, silence or an unavailable form is not
 approval. Do not create resources, register providers, assign roles or write
 ownership state before approval. The separate setup-progress checkpoint may

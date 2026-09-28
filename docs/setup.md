@@ -53,7 +53,9 @@ raw credentials, tokens, API keys or sensitive raw tool output. Record:
 
 - Current stage/status (`awaiting_choice`, `awaiting_write_approval`,
   `blocked_install`, `awaiting_restart`, `awaiting_image_approval` or `complete`),
-  pending question/options and next action.
+  pending question, exact rendered options/command, plan identifier, each option's
+  authorization scope/exclusions and next action. Preserve the actual wording
+  on resume; do not replace it with a loosely paraphrased decision.
 - Checkout path, verified remote and commit SHA; confirmed tenant/subscription,
   principal and new/reuse selection.
 - Proposed resource names, region/model/SKU, role scope, topology/cost summary
@@ -91,6 +93,158 @@ and provide the supported continuation path. This prompt cannot change host
 orchestration rules or guarantee cross-session memory; the checkpoint and
 [client restart handoff](clients.md#activate-in-a-new-process-and-resume) make
 progress recoverable without assuming an active process can reload its tools.
+
+## Action-first checkpoints
+
+Every pause must start with an **ACTION REQUIRED** block, not a progress report.
+Present one pending decision, why it blocks progress, exact copyable replies
+or command, and the immediate consequence and authorization limits of each.
+Fill placeholders with known values; never invent missing scope or mark a
+failed/uncertain check passed. Keep technical evidence after the action block.
+If a form is unavailable, use the same block in ordinary output where host
+policy permits; otherwise state the required host continuation path.
+
+End the response with a truthful status about the **pending** action. The
+examples assume that action has not been attempted. If it has, replace the
+last sentence with its observed status, such as "The earlier deployment may
+have partially succeeded; no additional writes have been initiated." Never
+claim no Azure changes or no image charge merely because a request timed out.
+If evidence follows a template, move its final status sentence to the end
+of the response rather than burying the action block beneath the evidence.
+
+### Sign-in
+
+```text
+## ACTION REQUIRED — AZURE SIGN-IN
+
+I need a signed-in identity to inspect the selected Azure scope. Run:
+az login --tenant <confirmed tenant ID>
+
+Complete authentication in Azure's sign-in UI; do not paste credentials here.
+Reply `Signed in` when done: I will check the actual identity and current
+subscription read-only. This does not approve resource/role writes or images.
+Reply `Cancel setup.` to stop without new setup actions.
+No Azure resource writes have been initiated by this sign-in step.
+```
+
+Use `az login` if the tenant has not been selected. A sign-in acknowledgment
+does not establish which account signed in; verify it before using saved scope.
+
+### Initial scope and deployment choice
+
+```text
+## ACTION REQUIRED — CHOOSE DEPLOYMENT
+
+Confirm tenant <tenant> and subscription <subscription>, then choose a path.
+I cannot choose whether to plan new resources or inspect your existing resource.
+Reply with one option:
+
+1. `New deployment; confirmed` — I will run read-only feasibility for this
+   scope, then present a separate write plan. No creation, roles or images
+   are authorized by this reply.
+2. `Reuse; confirmed` — include endpoint, deployment alias and owner-confirmed
+   model/version. I will verify the existing deployment read-only where
+   authorized, then configure the client; I will not modify that resource
+   or generate an image. If details are missing, I will ask for those next.
+3. `Change scope: <tenant/subscription>` — I will confirm the new scope before
+   continuing. This does not authorize writes.
+4. `Cancel setup.` — I will stop without new setup actions.
+
+No Azure writes for this plan have occurred.
+```
+
+### Final resource/role write approval
+
+```text
+## ACTION REQUIRED — AZURE WRITE APPROVAL
+
+Read-only findings: <verified results and remaining uncertainties>.
+I need explicit approval before these potentially billable resource/role writes.
+Plan <plan identifier>:
+- Tenant/subscription/principal: <exact values>
+- Resource group/account: <exact names>
+- Deployment: <alias, model/version, SKU/capacity>
+- Region/topology: <region, public network/key settings>
+- Costs: <dated estimate or explicit unknowns, not a guaranteed total>
+- Role: <role, exact resource scope and target principal>
+- Provider registration: <needed write or already registered/no write>
+- Ownership-state path: <absolute path>
+- Runtime installation: <ready or blocked, with exact reason>
+
+`Approve the Azure plan exactly as listed.` — I will revalidate volatile
+checks, then execute only this plan. This does not authorize image requests.
+`Change the plan: <change>` — I will revise the plan and ask again, without writes.
+`Cancel setup.` — I will stop; I will not delete resources as part of cancellation.
+
+No writes for this plan have occurred.
+```
+
+Do not offer execution with a known permission/quota blocker. If runtime
+installation is blocked, default to waiting. To allow informed provisioning
+anyway, replace the approval option with
+`Approve the Azure plan exactly as listed despite blocked runtime installation.`
+and explicitly say it creates potentially costly resources the MCP cannot yet
+use. Ordinary plan approval without that acknowledgment is insufficient then.
+Bind either short approval to the exact pending plan and trusted conversation
+turn, not an arbitrary checkpoint file. A changed plan invalidates approval.
+
+### Client restart
+
+```text
+## ACTION REQUIRED — RESTART COPILOT CLI
+
+Configuration is written, but this process cannot load the new MCP server.
+Exit it and run: <exact command with config path and applicable resume option>
+
+Reply `Restarted` in the resumed session if needed. I will verify the four
+tools and call only get_capabilities; this authorizes activation checks, not
+Azure resource writes or paid inference.
+Reply `Pause setup.` instead to retain progress without further actions.
+No activation verification in the new process has occurred.
+```
+
+Use the actual host's command and name, not Copilot wording for another host.
+A `Restarted` reply alone is not proof of discovery.
+
+### Optional paid image
+
+```text
+## ACTION REQUIRED — OPTIONAL BILLABLE IMAGE
+
+Setup and nonbillable diagnostics succeeded; inference is still unverified.
+I need separate approval because this request may incur Azure charges.
+- Brief: <exact brief>
+- Size/quality/count: 1536x864, high, one PNG
+- Endpoint/deployment: <exact configured values>
+- Maximum submissions: one; no automatic retries
+
+1. `Approve one image exactly as described.` — I will retain a new operation
+   UUID and submit once; uncertain results use get_operation, not resubmission.
+   This does not authorize resource changes, edits or additional images.
+2. `Finish without generating an image.` — I will finish setup with inference
+   unverified and no paid test.
+
+No image has been requested for this test.
+```
+
+### Blocker or failed check
+
+```text
+## ACTION REQUIRED — INSTALLATION BLOCKED
+
+<Exact sanitized failure and why no approved distribution route is usable>.
+1. `Retry the installation check.` — I will retry only the identified check.
+   This does not authorize Azure writes, new package sources or paid images.
+2. `Pause setup.` — I will save the checkpoint and stop without new actions.
+3. `Cancel setup.` — I will stop; existing resources/configuration are not deleted.
+
+No additional installation attempt has occurred since this failure.
+```
+
+Adapt the blocker and retry scope to the actual failure. Never label a
+provisioning replay as a read-only check. Each pause must store the exact
+displayed decision in the private checkpoint so the next reply can resume it
+without repeating the original setup prompt or losing its authorization limits.
 
 ## 1. Select configuration, not a resource-management workflow
 
