@@ -42,7 +42,7 @@ fallback. No exact ChatGPT backend or output parity is claimed.
 
 **Let your coding agent do the setup.** Use Copilot CLI, VS Code Copilot in a
 local agent session, or Claude Code on the machine where the MCP will run.
-Paste the prompts below in order. No Azure portal configuration is needed:
+Paste the single prompt below. No Azure portal configuration is needed:
 the agent uses Azure CLI and this repository's provisioning script.
 You still complete interactive sign-in and approve subscription, resource costs
 and permissions. A subscription with model access/quota is required; an agent
@@ -54,11 +54,19 @@ Claude Code setup is based on its documented stdio interface, **not a live-teste
 image workflow**. These instructions are for local agents, not a hosted coding
 agent that cannot access your local Azure login or files.
 
-### 1. Ask the agent to prepare Azure
+### Ask your agent: set this up for me
 
 ```text
-Set up https://github.com/juanmicrosoft/image-gen-mcp for me using Azure CLI,
-without Azure portal configuration. Use an isolated private checkout, verify
+Set up https://github.com/juanmicrosoft/image-gen-mcp end to end for the
+coding-agent application hosting this conversation. Use Azure CLI, without
+Azure portal configuration. Carry the configuration forward through the stages
+below; do not require me to paste another setup prompt. Pause for sign-in,
+required choices, explicit approvals or blockers, then continue after they
+are resolved. This prompt does not authorize resource changes or paid images.
+
+1. Prepare the environment and Azure plan.
+
+Use an isolated private checkout, verify
 its remote is https://github.com/juanmicrosoft/image-gen-mcp.git and report
 the resolved commit SHA. Read AGENTS.md, docs/azure-setup.md, docs/setup.md,
 docs/clients.md and docs/live-testing.md before Azure actions.
@@ -125,24 +133,12 @@ Keep ownership state for recovery/cleanup, including after partial failure.
 Never delete/adopt unrelated resources or reset state to bypass ownership.
 Read back deployment success and save the endpoint, deployment and output
 directory in private local configuration, not source control. Do not expose
-keys/tokens or generate any images. Finish with the configuration values
-needed for the next prompt and the state path; do not claim inference is tested.
-```
+keys/tokens or generate any images at this stage. Retain the configuration
+values and state path for the next stage; do not claim inference is tested.
 
-The agent can run `az login --use-device-code` when normal interactive login is
-unavailable. Sign-in may open a browser; that is authentication, not manual Azure
-resource configuration. New resources use the existing
-[ownership-safe provision/cleanup flow](docs/azure-setup.md). Provisioning is in
-the **source checkout**, not the npm runtime package.
+2. Install the runtime and connect this host.
 
-### 2. Ask the agent to connect your client
-
-Paste this into the same local agent conversation; no client-name substitution
-is needed:
-
-```text
-Connect image-gen-mcp to the coding-agent application hosting this
-conversation, using the Azure configuration from the previous step.
+Use the Azure configuration established above, without asking me to re-enter it.
 
 Identify the host application and use its supported MCP configuration format
 and registration method. Configure only this host, not every installed client.
@@ -156,7 +152,7 @@ npm view @juanmicrosoft/image-gen-mcp dist-tags.latest --registry=https://regist
 Report the exact version returned and check that version's release notes,
 Node requirements and setup compatibility. If lookup fails or compatibility
 is unclear, stop and explain rather than guessing a version or downgrading.
-For a network failure, use the bounded npm diagnostic in the first prompt;
+For a network failure, use the bounded npm diagnostic above;
 leave installation/configuration incomplete and resume only on an explicit
 retry, without changing package sources or disabling security controls.
 Install that exact resolved version with --ignore-scripts in a persistent
@@ -186,33 +182,46 @@ Verify that this client discovers get_capabilities, generate_image,
 edit_image and get_operation. Call only get_capabilities and explain any
 unverified inference/permission checks. If you cannot inspect the client
 session, tell me the exact check to run rather than claiming it is connected.
-Do not request an image or automatically approve billable tools.
-```
+Do not request an image or automatically approve billable tools at this stage.
 
-The [client guide](docs/clients.md) includes concrete configuration commands.
-This prompt selects the latest release once, then pins the resolved version for
-installation; starting the MCP does not trigger automatic upgrades. The manual
-example below remains pinned to the verified `0.1.0` release. Its qualification
-evidence does not certify future package versions.
-There is no MCP OAuth login here: the local server uses the Azure CLI identity
-you authorized. Valid configuration or a working `az login` is **not** proof of
-inference permission.
+3. Offer an optional one-image test.
 
-### 3. Try one image, deliberately
+After connection and nonbillable diagnostics succeed, report setup complete
+with inference still unverified. Ask whether I approve at most one billable
+generation request through the configured image-gen deployment. Show the
+proposed image brief and charge warning before asking. If I decline, finish
+without images. If the approval form is unavailable, provide the exact reply
+needed and stop; silence or pasting this setup prompt is not approval.
 
-Only after you are ready for an Azure image charge, paste:
-
-```text
-I approve at most one billable image-generation request through image-gen.
-Create a fresh operation UUID and retain it before submission. Generate a
+Unless I choose a different brief before approval, propose a
 1536x864 high-quality PNG of a lighthouse on a quiet rocky coast at dawn,
-with open sky on the left for a title. Use the configured deployment only.
+with open sky on the left for a title. Only after explicit approval, create a
+fresh operation UUID, retain it before submission and generate the approved
+image. Use the configured deployment only.
 Do not retry, edit, switch models or submit another request automatically.
 If the outcome or client transport is uncertain, call get_operation with
 the same UUID instead of generating again. On success, inspect the saved
 full-resolution PNG using a local image-reading tool if available and show
 me its path. If you cannot inspect it, say so; do not claim visual quality.
+Finish with the installed version, configured host, private configuration/state
+paths, verification results and any remaining limitations. Never describe a
+blocked or unverified step as completed.
 ```
+
+### What to expect
+
+The agent will pause for your approvals, not for another setup prompt. It can
+use `az login --use-device-code` when normal interactive login is unavailable.
+Sign-in may open a browser; that is authentication, not portal resource setup.
+Provisioning uses the [ownership-safe source script](docs/azure-setup.md), not
+the npm runtime package. The [client guide](docs/clients.md) provides commands.
+
+The prompt selects the latest release once and installs that exact version;
+starting the MCP does not trigger automatic upgrades. The manual example below
+remains pinned to verified `0.1.0`; its evidence does not certify future versions.
+There is no MCP OAuth login: the local server uses your authorized Azure CLI
+identity. Configuration and diagnostics do not prove inference permission.
+Declining the optional paid test does not prevent completing client setup.
 
 To remove a **new, task-owned** deployment later, ask the agent to read the saved
 state, show the exact resource group and deletion impact, obtain your explicit

@@ -1,6 +1,6 @@
 # Copilot, Claude Code and filesystem boundaries
 
-Start with the [copyable setup prompts](../README.md#get-started). Install the
+Start with the [single copyable setup prompt](../README.md#get-started). Install the
 pinned published runtime as in the README, or build a source checkout. For
 registry installs, use the absolute entrypoint
 `/YOUR/PREFIX/node_modules/@juanmicrosoft/image-gen-mcp/dist/cli.js` in place of
