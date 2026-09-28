@@ -103,10 +103,12 @@ lockfiles without approval.
 If public npm access fails, run at most one diagnostic:
 npm ping --registry=https://registry.npmjs.org/ --fetch-retries=0 --fetch-timeout=15000
 Report the exact sanitized error. A connection/TLS failure is not proof that
-a package is missing. Defer installation and allow a later explicit retry;
-do not change registries, disable TLS checks or bypass network policies.
+a package is missing. Keep npm as the default; for connectivity/availability
+failure, try the documented GitHub Releases bundle fallback only if permitted
+by organizational policy. Do not switch npm registries, disable TLS checks or
+bypass a policy denial. Do not fall back on integrity/security errors.
 Continue independent read-only Azure feasibility checks, but report that
-runtime installation is still blocked.
+runtime installation is blocked until either installation route succeeds.
 
 Check az account show first and display only the current/default subscription
 and tenant. If I need another one, summarize counts by tenant and show a
@@ -150,7 +152,7 @@ the exact tenant/subscription, runtime principal, region/model/SKU, resource
 names, topology/costs, role and resource scope, provider registration if needed,
 and absolute state path. This is a second, distinct authorization to write;
 the earlier new/reuse choice never substitutes for it.
-If npm connectivity blocks runtime installation, default to waiting before
+If both npm and an approved GitHub bundle route are unavailable, wait before
 provisioning. I may explicitly choose to provision anyway: the final write
 approval must acknowledge creating resources with possible costs that this
 MCP cannot yet use. Keep runtime installation blocked; that approval neither
@@ -180,20 +182,33 @@ Do not infer the host from the AI model name: a Claude model inside Copilot
 still needs Copilot configuration. If the host is ambiguous, unsupported by
 this guide, or its configuration is inaccessible, ask me before changing it.
 
-Use the latest release of @juanmicrosoft/image-gen-mcp available from the
-public npm registry at setup time. Resolve its latest tag with:
+Use npm first. Resolve the latest @juanmicrosoft/image-gen-mcp version with:
 npm view @juanmicrosoft/image-gen-mcp dist-tags.latest --registry=https://registry.npmjs.org/
 Report the exact version returned and check that version's release notes,
 Node requirements and setup compatibility. If lookup fails or compatibility
-is unclear, stop and explain rather than guessing a version or downgrading.
-For a network failure, use the bounded npm diagnostic above;
-leave installation/configuration incomplete and resume only on an explicit
-retry, without changing package sources or disabling security controls.
+is unclear, do not guess a version or downgrade.
+For npm connectivity/availability failure, use the bounded diagnostic above
+and read docs/github-release-install.md. If GitHub distribution is allowed,
+download the self-contained bundle and checksum for the exact resolved version
+and OS/architecture. If npm could not resolve a version, inspect the latest
+non-prerelease GitHub release and record its exact version instead. Verify the
+checksum, release provenance and compatibility before extraction or execution.
+If that release lacks a compatible asset, or verification or policy checks
+fail, stop with the precise blocker; do not choose an older release silently.
+GitHub source archives and npm tarballs are not dependency-complete bundles.
+Keep the extracted bundle at a persistent path and use its launcher, bundled
+Node and configure-client helper; do not run npm install inside it.
+If neither route works, checkpoint installation as blocked for a later explicit
+retry. Never change arbitrary package sources or disable security controls.
+
+For a successful npm route:
 Install that exact resolved version with --ignore-scripts in a persistent
 local prefix. Do not use a floating @latest command in the MCP launcher or
 silently upgrade an existing installation; ask before replacing it.
 Use an absolute installed entrypoint and the correct client-specific format
 in docs/clients.md, adjusted only for documented changes in the chosen release.
+For the bundle route, use the absolute image-gen-mcp launcher with no arguments
+and the bundled configure-client launcher instead of system node/npm paths.
 Use IMAGE_GEN_AUTH=azure-cli, IMAGE_GEN_PREVIEW=false and an absolute private
 output directory; do not pass AZURE_OPENAI_API_KEY in CLI-auth mode.
 Pass the endpoint, deployment and any explicit tenant.
@@ -203,7 +218,8 @@ to the MCP process. Ensure that process can find node and az.
 Inspect existing client configuration first. Add only the image-gen entry
 without overwriting other servers; stop on a name conflict. Keep personal
 configuration outside source control and preserve host approval policies.
-For Copilot CLI, prefer the installed configure-client.mjs helper and a
+For Copilot CLI, prefer the installed configure-client.mjs helper (or the
+bundle's configure-client launcher) and a
 private session-local --additional-mcp-config file.
 For VS Code, merge into my user MCP configuration; do not commit personal
 settings in .vscode/mcp.json.
@@ -254,8 +270,9 @@ blocked or unverified step as completed.
 
 The agent will pause for your replies, not for another setup prompt. A short
 new/reuse choice confirms the displayed scope for read-only work; a separate
-precise approval authorizes the final write plan. If npm is unreachable, the
-default is to wait, but you may explicitly approve provisioning despite the
+precise approval authorizes the final write plan. If npm is unreachable, an approved compatible
+[GitHub Releases bundle](docs/github-release-install.md) is the fallback.
+If neither route works, the default is to wait, but you may explicitly approve provisioning despite the
 blocked runtime installation and possible resource costs.
 
 A private checkpoint carries progress across replies and client restarts.

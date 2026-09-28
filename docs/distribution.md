@@ -9,6 +9,12 @@ published source/archive from later documentation changes and retains initial
 availability failures. Local direct-registry connectivity remains unavailable;
 hosted Ubuntu verification does not certify every client/platform.
 
+**npm is the default.** For registry connectivity/availability failures, use
+the [self-contained GitHub release bundle](github-release-install.md) when
+permitted by your organization. Its included Node and production dependencies
+remove the consumer-side npm requirement. The ordinary npm tarball below does
+not include dependencies; downloading it from GitHub would not solve that issue.
+
 From a source checkout with dependencies installed:
 
 ```sh

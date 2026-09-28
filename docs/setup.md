@@ -28,8 +28,12 @@ npm ping --registry=https://registry.npmjs.org/ --fetch-retries=0 --fetch-timeou
 
 Retain the sanitized error. `ENOTCONN` or a TLS failure is not a missing-package
 verdict; even a successful ping does not prove a particular version exists.
-Do not switch package sources or disable TLS/network protections. Defer runtime
-installation until an explicit later retry. Independent read-only Azure checks
+Keep npm as the default. On a connectivity/availability failure, use the
+[self-contained GitHub Releases fallback](github-release-install.md) only when
+organizational policy permits it and a compatible verified asset is available.
+Do not bypass a policy/security denial, switch npm registries or disable TLS.
+If neither route is available, defer installation until an explicit later retry.
+Independent read-only Azure checks
 can continue without npm dependencies, but do not claim the MCP is installed
 or connected, and disclose the blocker before requesting resource creation.
 
@@ -55,7 +59,8 @@ raw credentials, tokens, API keys or sensitive raw tool output. Record:
 - Proposed resource names, region/model/SKU, role scope, topology/cost summary
   and absolute **planned** provisioning ownership-state path.
 - Feasibility results with timestamps, scope and uncertainties; sanitized npm
-  diagnostic status, chosen package version and installation status.
+  diagnostic status, chosen package version, distribution route (npm or approved
+  GitHub bundle), verified asset/hash when applicable and installation status.
 - Approved plan and references to the actual user approval turns, including
   explicit blocked-install acknowledgment if provisioning proceeds without npm.
 - Observed provisioning status, endpoint/deployment, private config/output paths,
@@ -153,6 +158,8 @@ unset AZURE_OPENAI_API_KEY
 
 For registry installs, substitute the installed helper path above and retain
 the same `--allow-plaintext-key` acknowledgment.
+For GitHub bundles, use the included `configure-client` launcher instead of
+`node scripts/configure-client.mjs`; it uses the bundled Node and app paths.
 
 The helper writes only selected runtime settings, uses an exclusive 0600 file
 and never overwrites existing client configuration or registers globally. The

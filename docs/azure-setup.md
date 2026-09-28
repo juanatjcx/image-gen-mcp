@@ -34,11 +34,14 @@ Do not count switching accounts or asking to retry as approval to provision.
 An incomplete permission/quota check must remain an explicit blocker or
 uncertainty, never be silently marked passed.
 
-Registry failure does not prevent Azure provisioning technically. The default
+Registry failure does not prevent Azure provisioning technically. Try the
+[approved GitHub bundle fallback](github-release-install.md) for runtime
+installation first when possible. If neither distribution route works, the default
 workflow waits, but the user may explicitly approve creating resources despite
 blocked MCP installation and possible costs. Include that acknowledgment in the
 final write approval; neither the initial scope choice nor a generic retry is
-sufficient. Preserve the blocked runtime status and do not change package sources.
+sufficient. Preserve the blocked runtime status and do not use arbitrary
+package sources or bypass organizational policy.
 Read-only progress belongs in the [separate setup checkpoint](setup.md#resuming-a-paused-setup);
 only the provisioning script creates ownership state after approval, before
 resource creation.

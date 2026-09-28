@@ -162,3 +162,22 @@ anonymous metadata/archive/integrity and fresh installation/MCP discovery checks
 against the fixed reviewed `0.1.0` archive hash above. It neither republishes nor
 requests images, and a failed check remains a failure without automatic retries.
 Record its actual run before claiming registry installation is verified.
+
+## Application bundle assets
+
+The separate `Application bundles` workflow packages the immutable published
+`0.1.0` archive and its original source lockfile with Node 22.22.2 and production
+dependencies. The workflow has read-only permissions and never publishes npm or
+uploads release assets. A maintainer attaches the exact successful main-run
+artifacts to `v0.1.0` after independent review, without replacing existing assets
+or moving the tag. Bundle build code is newer than the original app/tag;
+`provenance.json` records both identities, hashes and the build run.
+
+Before using the [fallback](github-release-install.md), require the named
+platform asset and checksum to exist on the release. An automatic GitHub source
+archive is not an application bundle. Cold bundle verification, native image
+processing and discovery evidence accompany each archive as
+`image-gen-mcp-0.1.0-PLATFORM-ARCH.verification.json`.
+This is not new live Azure/client qualification or application code signing.
+The release notes record the actual asset-publication run; documentation alone
+does not establish that an asset is available.
