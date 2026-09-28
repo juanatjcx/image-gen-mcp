@@ -100,7 +100,17 @@ Every pause must start with an **ACTION REQUIRED** block, not a progress report.
 Present one pending decision, why it blocks progress, exact copyable replies
 or command, and the immediate consequence and authorization limits of each.
 Fill placeholders with known values; never invent missing scope or mark a
-failed/uncertain check passed. Keep technical evidence after the action block.
+failed/uncertain check passed.
+**Routine pauses: at most 120 words, one question/reason, and 2-4 numbered
+options.** Prefer 3-4 options only when meaningful; never invent choices to
+fill a quota. Use a copyable reply and one concise consequence per option,
+no nested bullets, and state shared exclusions once. No unsolicited evidence,
+logs, progress recap or repeated justification: retain those in the checkpoint
+and provide them on request. Exact write plans, material risks and truthful
+uncertain-action status may exceed the limit when necessary for informed consent.
+Do not shorten away the actual scope, charge warning or required acknowledgment.
+Unambiguous option numbers may select the exact saved unchanged decision where
+host policy permits; ambiguity or changed options requires clarification.
 If a form is unavailable, use the same block in ordinary output where host
 policy permits; otherwise state the required host continuation path.
 
@@ -109,7 +119,7 @@ examples assume that action has not been attempted. If it has, replace the
 last sentence with its observed status, such as "The earlier deployment may
 have partially succeeded; no additional writes have been initiated." Never
 claim no Azure changes or no image charge merely because a request timed out.
-If evidence follows a template, move its final status sentence to the end
+If requested evidence follows a template, move its final status sentence to the end
 of the response rather than burying the action block beneath the evidence.
 
 ### Sign-in
@@ -121,9 +131,9 @@ I need a signed-in identity to inspect the selected Azure scope. Run:
 az login --tenant <confirmed tenant ID>
 
 Complete authentication in Azure's sign-in UI; do not paste credentials here.
-Reply `Signed in` when done: I will check the actual identity and current
-subscription read-only. This does not approve resource/role writes or images.
-Reply `Cancel setup.` to stop without new setup actions.
+1. `Signed in` — I will verify identity and subscription read-only.
+2. `Cancel setup.` — I will stop without new setup actions.
+Neither reply approves resource/role writes or images.
 No Azure resource writes have been initiated by this sign-in step.
 ```
 
@@ -135,21 +145,15 @@ does not establish which account signed in; verify it before using saved scope.
 ```text
 ## ACTION REQUIRED — CHOOSE DEPLOYMENT
 
-Confirm tenant <tenant> and subscription <subscription>, then choose a path.
-I cannot choose whether to plan new resources or inspect your existing resource.
-Reply with one option:
+Tenant: <tenant>. Subscription: <subscription>.
+Which deployment path should I plan?
 
-1. `New deployment; confirmed` — I will run read-only feasibility for this
-   scope, then present a separate write plan. No creation, roles or images
-   are authorized by this reply.
-2. `Reuse; confirmed` — include endpoint, deployment alias and owner-confirmed
-   model/version. I will verify the existing deployment read-only where
-   authorized, then configure the client; I will not modify that resource
-   or generate an image. If details are missing, I will ask for those next.
-3. `Change scope: <tenant/subscription>` — I will confirm the new scope before
-   continuing. This does not authorize writes.
-4. `Cancel setup.` — I will stop without new setup actions.
+1. `New deployment; confirmed` — check feasibility read-only, then propose a write plan.
+2. `Reuse; confirmed` — ask for endpoint, alias and model/version, then verify read-only.
+3. `Change scope: <tenant/subscription>` — confirm a different scope first.
+4. `Cancel setup.` — stop.
 
+Choices authorize only the stated read-only planning, not resources, roles or images.
 No Azure writes for this plan have occurred.
 ```
 
@@ -171,10 +175,10 @@ Plan <plan identifier>:
 - Ownership-state path: <absolute path>
 - Runtime installation: <ready or blocked, with exact reason>
 
-`Approve the Azure plan exactly as listed.` — I will revalidate volatile
+1. `Approve the Azure plan exactly as listed.` — I will revalidate volatile
 checks, then execute only this plan. This does not authorize image requests.
-`Change the plan: <change>` — I will revise the plan and ask again, without writes.
-`Cancel setup.` — I will stop; I will not delete resources as part of cancellation.
+2. `Change the plan: <change>` — I will revise the plan and ask again, without writes.
+3. `Cancel setup.` — I will stop; I will not delete resources as part of cancellation.
 
 No writes for this plan have occurred.
 ```
@@ -196,10 +200,9 @@ turn, not an arbitrary checkpoint file. A changed plan invalidates approval.
 Configuration is written, but this process cannot load the new MCP server.
 Exit it and run: <exact command with config path and applicable resume option>
 
-Reply `Restarted` in the resumed session if needed. I will verify the four
-tools and call only get_capabilities; this authorizes activation checks, not
-Azure resource writes or paid inference.
-Reply `Pause setup.` instead to retain progress without further actions.
+1. `Restarted` — in the resumed session, I will verify four tools and call get_capabilities.
+2. `Pause setup.` — retain progress without further actions.
+These authorize activation checks only, not Azure writes or paid inference.
 No activation verification in the new process has occurred.
 ```
 
