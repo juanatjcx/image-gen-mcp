@@ -6,6 +6,13 @@ registry installs, use the absolute entrypoint
 `/YOUR/PREFIX/node_modules/@juanmicrosoft/image-gen-mcp/dist/cli.js` in place of
 the source-checkout path in these examples. Replace every uppercase placeholder:
 
+If npm fails and policy permits GitHub distribution, follow the
+[verified bundle route](github-release-install.md). Set `command` to the
+absolute bundle `image-gen-mcp` launcher and `args` to `[]`, retaining the same
+client-specific environment. Use its `configure-client` launcher for the
+Copilot helper; do not run a system Node or npm install inside the bundle.
+For Claude Code, replace the command after `--` with the bundle launcher alone.
+
 - [Copilot CLI](../examples/copilot-cli.mcp.json): user `~/.copilot/mcp-config.json`,
   or session-local `--additional-mcp-config @/absolute/config.json`. `/mcp add`
   is also available. The CLI uses top-level `mcpServers`.

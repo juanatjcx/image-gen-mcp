@@ -1,0 +1,63 @@
+name: Application bundles
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Bundle (${{ matrix.platform }}-${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+    env:
+      IMAGE_GEN_LIVE: "false"
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+      NPM_CONFIG_FETCH_RETRIES: "0"
+      EXPECTED_PLATFORM: ${{ matrix.platform }}
+      EXPECTED_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.22.2
+      - name: Install verification tooling
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Fetch immutable reviewed release inputs
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import assert from "node:assert/strict"; assert.equal(process.platform,process.env.EXPECTED_PLATFORM); assert.equal(process.arch,process.env.EXPECTED_ARCH)'
+          curl --fail --silent --show-error --max-time 60 \
+            https://registry.npmjs.org/@juanmicrosoft/image-gen-mcp/-/image-gen-mcp-0.1.0.tgz \
+            --output "$RUNNER_TEMP/published.tgz"
+          curl --fail --silent --show-error --max-time 60 \
+            https://raw.githubusercontent.com/juanmicrosoft/image-gen-mcp/023a1d638baa28bb23200c60998ad3ce34695a1b/package-lock.json \
+            --output "$RUNNER_TEMP/source-lock.json"
+      - name: Build dependency-complete application
+        run: |
+          node scripts/build-bundle.mjs --package "$RUNNER_TEMP/published.tgz" \
+            --lock "$RUNNER_TEMP/source-lock.json" --output "$RUNNER_TEMP/bundles"
+      - name: Verify cold extraction with network denied and no Node or npm on PATH
+        run: node scripts/verify-bundle.mjs --directory "$RUNNER_TEMP/bundles"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: app-bundle-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ runner.temp }}/bundles/
+          if-no-files-found: error
+          retention-days: 14
