@@ -58,15 +58,38 @@ agent that cannot access your local Azure login or files.
 
 ```text
 Set up https://github.com/juanmicrosoft/image-gen-mcp for me using Azure CLI,
-without Azure portal configuration. Read AGENTS.md, docs/azure-setup.md,
-docs/setup.md and docs/clients.md from a trusted checkout first.
+without Azure portal configuration. Use an isolated private checkout, verify
+its remote is https://github.com/juanmicrosoft/image-gen-mcp.git and report
+the resolved commit SHA. Read AGENTS.md, docs/azure-setup.md, docs/setup.md,
+docs/clients.md and docs/live-testing.md before Azure actions.
 
 Check Node (tested 22.22.2), npm, Azure CLI and Bicep. If something is missing,
 propose the official installation command for my OS before installing it.
-Check my az login and available subscriptions. If sign-in is needed, start
-az login and let me complete it; never ask me to paste credentials into chat.
+The Azure provisioning script uses Node built-ins and az; it does not need
+npm ci or an installed MCP runtime. Before any source dependency install,
+check whether package-lock.json exists both in the resolved Git tree and on
+disk. Use npm ci only with the documented lockfile. If it is missing, report
+the checkout/download discrepancy; do not generate or modify manifests or
+lockfiles without approval.
+
+If public npm access fails, run at most one diagnostic:
+npm ping --registry=https://registry.npmjs.org/ --fetch-retries=0 --fetch-timeout=15000
+Report the exact sanitized error. A connection/TLS failure is not proof that
+a package is missing. Defer installation and allow a later explicit retry;
+do not change registries, disable TLS checks or bypass network policies.
+Continue independent read-only Azure feasibility checks, but report that
+runtime installation is still blocked.
+
+Check az account show first and display only the current/default subscription
+and tenant. If I need another one, summarize counts by tenant and show a
+small filtered selection; do not dump the full subscription inventory.
+If sign-in is needed, start az login and let me complete it; never ask me to
+paste credentials into chat.
 Ask me to choose/confirm the tenant and subscription, and whether to reuse
 an existing compatible image deployment or create a dedicated new one.
+Use supported commands from the installed az version. For missing read-only
+checks, az rest may use an official documented ARM endpoint and API version;
+cite the documentation rather than guessing commands or undocumented endpoints.
 
 For reuse, ask for the inference endpoint and deployment alias; verify the
 model/version when authorized, otherwise get confirmation from its owner.
@@ -75,13 +98,28 @@ Do not modify an existing resource or treat its alias as proof of its model.
 For a new deployment, use scripts/azure.mjs and infra/main.bicep from the
 checkout, not an improvised deployment. Explain the proposed region, model,
 public-network/key-enabled development topology, expected costs and required
-resource-creation plus role-assignment permissions. Get my approval before
-resource creation, provider registration or role changes. Check actual
-model/version/SKU/quota availability; do not silently switch model or region.
+resource-creation plus role-assignment permissions. Before proposing writes,
+check identity, subscription, provider registration, model/version/SKU/quota,
+topology, current pricing, proposed names and effective RBAC when authorized.
+Contributor alone does not grant role-assignment write permission. Mark any
+unverified check or pricing estimate explicitly; do not claim guaranteed
+capacity or cost. Do not silently switch model or region.
 Use --auth azure-cli, an explicitly confirmed subscription, unique account
 and dedicated resource-group names, and an absolute private --state path.
 Do not grant subscription-wide Owner or fall back to API keys on failure.
 If access/quota is blocked, report the exact blocker and required admin action.
+
+Present one consolidated approval gate after read-only feasibility, listing
+the exact tenant/subscription, runtime principal, region/model/SKU, resource
+names, topology/costs, role and resource scope, provider registration if needed,
+and absolute state path. If runtime installation is blocked, disclose that
+before requesting approval to create resources that cannot yet be used.
+Include a one-line approval statement with these actual values and precisely
+the proposed writes. If a confirmation form cannot be delivered or reports me
+unavailable, display that statement and stop; wait for my explicit reply.
+Account switching, a retry request, silence or an unavailable form is not
+approval. Do not create resources, register providers, assign roles or write
+ownership state before approval. Reconfirm if the approved plan changes.
 
 Keep ownership state for recovery/cleanup, including after partial failure.
 Never delete/adopt unrelated resources or reset state to bypass ownership.
@@ -118,6 +156,9 @@ npm view @juanmicrosoft/image-gen-mcp dist-tags.latest --registry=https://regist
 Report the exact version returned and check that version's release notes,
 Node requirements and setup compatibility. If lookup fails or compatibility
 is unclear, stop and explain rather than guessing a version or downgrading.
+For a network failure, use the bounded npm diagnostic in the first prompt;
+leave installation/configuration incomplete and resume only on an explicit
+retry, without changing package sources or disabling security controls.
 Install that exact resolved version with --ignore-scripts in a persistent
 local prefix. Do not use a floating @latest command in the MCP launcher or
 silently upgrade an existing installation; ask before replacing it.
