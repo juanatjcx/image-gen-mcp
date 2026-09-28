@@ -11,6 +11,28 @@ README commands. No Azure credentials are needed to install/build or run
 offline tests. [Registry installation and discovery](release.md) passed on
 hosted Ubuntu with Node 22.22.2; this is not a new live-client qualification.
 
+### If checkout or installation fails
+
+Before source installation, compare `git ls-tree --name-only HEAD package-lock.json`
+with the working-tree file. The tested commit
+`8babdc4e571f992c98e87deaa6575ef9141f7ecc` tracks `package-lock.json`; an absent
+local copy is not evidence that this commit lacks a lockfile. Inspect the
+checkout/download method rather than silently generating a replacement or
+switching from `npm ci` to an unlocked install.
+
+For a registry connection failure, use one bounded diagnostic:
+
+```sh
+npm ping --registry=https://registry.npmjs.org/ --fetch-retries=0 --fetch-timeout=15000
+```
+
+Retain the sanitized error. `ENOTCONN` or a TLS failure is not a missing-package
+verdict; even a successful ping does not prove a particular version exists.
+Do not switch package sources or disable TLS/network protections. Defer runtime
+installation until an explicit later retry. Independent read-only Azure checks
+can continue without npm dependencies, but do not claim the MCP is installed
+or connected, and disclose the blocker before requesting resource creation.
+
 ## 1. Select configuration, not a resource-management workflow
 
 ```sh

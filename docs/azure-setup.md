@@ -11,6 +11,24 @@ Provisioning uses `scripts/azure.mjs` and `infra/main.bicep` from a trusted sour
 checkout. They are intentionally not shipped as npm runtime commands. The
 script's default CLI-auth provisioning path expects an interactive Entra user
 (`az ad signed-in-user show`), not a service-principal login.
+It uses only Node built-ins plus `az`: npm dependency installation is not a
+prerequisite for Azure feasibility or provisioning. A blocked registry must
+still be disclosed before approving resources whose runtime cannot yet install.
+
+Show the current subscription first and filter any larger inventory rather
+than sending it all to the conversation. Check installed CLI help before using
+an unfamiliar subcommand; a missing read-only command may be replaced with
+`az rest` against an official documented ARM endpoint/API version, not a guessed
+API. Keep the actual writes in the reviewed provisioning flow below.
+
+After read-only feasibility, consolidate proposed writes into one approval
+request with exact tenant/subscription/principal, resource names, region,
+model/SKU, topology/costs, role scope and private state path. Include provider
+registration only if needed. If the host cannot deliver an approval form,
+present an exact approval sentence for the user to reply with and stop.
+Do not count switching accounts or asking to retry as approval to provision.
+An incomplete permission/quota check must remain an explicit blocker or
+uncertainty, never be silently marked passed.
 
 Requires Azure CLI, Bicep and a signed-in Entra user. The identity needs resource
 creation/deployment permissions and permission to assign the resource-scoped
