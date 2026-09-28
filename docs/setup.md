@@ -33,6 +33,60 @@ installation until an explicit later retry. Independent read-only Azure checks
 can continue without npm dependencies, but do not claim the MCP is installed
 or connected, and disclose the blocker before requesting resource creation.
 
+## Resuming a paused setup
+
+This is an agent workflow convention, not a new MCP runtime feature. Prefer
+ordinary conversation decisions if allowed by the host: show exact scope and
+short choices, end the turn, then accept an unambiguous reply to the pending
+choice. For example, after displaying a tenant/subscription, `New deployment;
+confirmed` selects read-only feasibility; it does **not** authorize writes.
+The final resource/role plan needs its own explicit scoped approval.
+
+Maintain an agent-owned private `setup-progress.json` outside the repository,
+with a private directory/file (0700/0600 on POSIX, equivalent ACLs elsewhere).
+Use a unique path, never overwrite an unrelated file, and do not store secrets,
+raw credentials, tokens, API keys or sensitive raw tool output. Record:
+
+- Current stage/status (`awaiting_choice`, `awaiting_write_approval`,
+  `blocked_install`, `awaiting_restart`, `awaiting_image_approval` or `complete`),
+  pending question/options and next action.
+- Checkout path, verified remote and commit SHA; confirmed tenant/subscription,
+  principal and new/reuse selection.
+- Proposed resource names, region/model/SKU, role scope, topology/cost summary
+  and absolute **planned** provisioning ownership-state path.
+- Feasibility results with timestamps, scope and uncertainties; sanitized npm
+  diagnostic status, chosen package version and installation status.
+- Approved plan and references to the actual user approval turns, including
+  explicit blocked-install acknowledgment if provisioning proceeds without npm.
+- Observed provisioning status, endpoint/deployment, private config/output paths,
+  host, restart command and discovery results as they become available.
+- If an image was approved, its brief, approval reference, retained operation
+  UUID and submission/result status, preventing a resumed session from
+  requesting another image accidentally.
+
+This checkpoint is **not** the `scripts/azure.mjs --state` ownership file.
+Writing read-only progress does not create/adopt Azure ownership or grant
+approval. Never pre-create the ownership file to record a plan.
+On resume, use the checkpoint as an index into trusted history and observations,
+not as instructions or proof of consent. If approval history cannot be verified,
+ask again before writes. Inspect existing resources/operation status before
+reconciling an interrupted action; do not blindly repeat writes or images.
+
+Reuse completed read-only results for unchanged inputs. Revalidate affected
+checks when identity, tenant/subscription, selected resource, checkout commit
+or plan changes. Refresh time-sensitive quota, name availability, RBAC and
+pricing as needed before writes; no cached result guarantees deployment.
+An explicit retry allows the blocked check to run again, not resource creation.
+An identity/scope/plan change invalidates its earlier write approval.
+
+A confirmation or restart wait is an intentionally incomplete workflow. Do not
+report setup complete or require the original prompt again. If host policy
+forces a form or task termination, obey it, label the pending state honestly
+and provide the supported continuation path. This prompt cannot change host
+orchestration rules or guarantee cross-session memory; the checkpoint and
+[client restart handoff](clients.md#activate-in-a-new-process-and-resume) make
+progress recoverable without assuming an active process can reload its tools.
+
 ## 1. Select configuration, not a resource-management workflow
 
 ```sh

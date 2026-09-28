@@ -44,6 +44,28 @@ For the prompt-first CLI-auth path, set `IMAGE_GEN_PREVIEW=false` and unset
 `AZURE_OPENAI_API_KEY` before running the helper. Explicitly add an isolated
 `AZURE_CONFIG_DIR` to the private server `env` if used; the helper does not copy it.
 
+### Activate in a new process and resume
+
+Generating a session-local file does not inject it into the running agent's
+tool inventory. If that host cannot dynamically reload, save an
+`awaiting_restart` [setup checkpoint](setup.md#resuming-a-paused-setup), then
+give the user a launch command with the actual private config path:
+
+```sh
+copilot --resume --additional-mcp-config "@$HOME/.config/image-gen-mcp/copilot.mcp.json"
+```
+
+`--resume` offers session selection; use `--resume=SESSION_ID` when the correct
+ID is known. Check installed `copilot --help` if options differ. The user should
+exit the old CLI and launch this from their terminal; the agent need not start
+a nested interactive CLI or claim it inspected that new process.
+After resuming, inspect `/mcp` and verify discovery plus `get_capabilities`.
+Until then, report **configuration written; activation/discovery pending**.
+If history cannot resume, a new conversation can be told to resume from the
+absolute checkpoint path without repeating the full setup prompt. Revalidate
+saved approval provenance before any new write; never provision again merely
+because the session changed.
+
 ## Claude Code: local stdio registration
 
 This is **Claude Code**, not Claude Desktop/web. The command syntax was checked

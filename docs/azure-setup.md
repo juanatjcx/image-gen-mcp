@@ -24,11 +24,24 @@ API. Keep the actual writes in the reviewed provisioning flow below.
 After read-only feasibility, consolidate proposed writes into one approval
 request with exact tenant/subscription/principal, resource names, region,
 model/SKU, topology/costs, role scope and private state path. Include provider
-registration only if needed. If the host cannot deliver an approval form,
-present an exact approval sentence for the user to reply with and stop.
+registration only if needed. The initial short new/reuse choice confirms the
+displayed tenant/subscription for read-only work, not resource creation.
+Prefer conversational replies when the host permits them. Final write approval
+must identify the exact plan; if a required form is unavailable, preserve a
+pending checkpoint and offer text options only where host policy permits.
+Resume on the next explicit response rather than restarting the workflow.
 Do not count switching accounts or asking to retry as approval to provision.
 An incomplete permission/quota check must remain an explicit blocker or
 uncertainty, never be silently marked passed.
+
+Registry failure does not prevent Azure provisioning technically. The default
+workflow waits, but the user may explicitly approve creating resources despite
+blocked MCP installation and possible costs. Include that acknowledgment in the
+final write approval; neither the initial scope choice nor a generic retry is
+sufficient. Preserve the blocked runtime status and do not change package sources.
+Read-only progress belongs in the [separate setup checkpoint](setup.md#resuming-a-paused-setup);
+only the provisioning script creates ownership state after approval, before
+resource creation.
 
 Requires Azure CLI, Bicep and a signed-in Entra user. The identity needs resource
 creation/deployment permissions and permission to assign the resource-scoped
