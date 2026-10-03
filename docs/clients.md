@@ -73,7 +73,7 @@ absolute checkpoint path without repeating the full setup prompt. Revalidate
 saved approval provenance before any new write; never provision again merely
 because the session changed.
 
-## Claude Code: local stdio registration
+## Claude Code: stdio registration
 
 This is **Claude Code**, not Claude Desktop/web. The command syntax was checked
 against the [official MCP reference](https://code.claude.com/docs/en/mcp) and
@@ -81,11 +81,11 @@ installed CLI help; generation/editing in Claude Code has **not** been qualified
 Using a Claude model inside Copilot does not establish Claude Code support.
 
 After choosing the endpoint/deployment/output path in [setup](setup.md), run
-this in the project where you want Claude Code to use the server:
+this to make the server available in every Claude Code project for your user:
 
 ```sh
 claude mcp add \
-  --scope local \
+  --scope user \
   --env "AZURE_OPENAI_ENDPOINT=$AZURE_OPENAI_ENDPOINT" \
   --env "AZURE_OPENAI_IMAGE_DEPLOYMENT=$AZURE_OPENAI_IMAGE_DEPLOYMENT" \
   --env "IMAGE_GEN_OUTPUT_DIR=$IMAGE_GEN_OUTPUT_DIR" \
@@ -96,9 +96,10 @@ claude mcp add \
 claude mcp get image-gen
 ```
 
-`--scope local` keeps the entry private to this user/project rather than writing
-shared `.mcp.json`. Inspect `claude mcp list` first and stop if `image-gen` already
-exists. Confirm environment variables are populated before running the command.
+`--scope user` stores the entry in your private user configuration and makes it
+available across projects; it never writes a shared `.mcp.json`. To limit the
+server to the current project only, use `--scope local` instead. Inspect
+`claude mcp list` first and stop if `image-gen` already exists. Confirm environment variables are populated before running the command.
 Unset `AZURE_OPENAI_API_KEY` in the launch environment when using CLI auth.
 If selected, add `--env "AZURE_TENANT_ID=$AZURE_TENANT_ID"` and, for an isolated
 login profile, `--env "AZURE_CONFIG_DIR=$AZURE_CONFIG_DIR"` **before**
@@ -107,7 +108,7 @@ Do not put keys/tokens in command arguments. The final `--` separates host optio
 from the server command. Resolve `node` to an absolute path if the host PATH
 differs; Azure CLI must also be reachable by the server.
 
-Start/restart `claude` in that project, inspect `/mcp`, and ask it to discover the
+Start/restart `claude`, inspect `/mcp`, and ask it to discover the
 four tools and call only `get_capabilities`. Approve tools deliberately; neither
 registration nor diagnostics proves inference access. Do not copy the
 Copilot-specific `tools`/`timeout` properties into Claude's configuration.
