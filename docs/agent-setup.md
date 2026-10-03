@@ -1,6 +1,6 @@
 # Agent setup procedure
 
-This is the procedure a coding agent follows when the user pastes the
+This is the procedure a coding agent follows when the user sends the
 [README setup prompt](../README.md#ask-your-agent-set-this-up-for-me). The
 prompt states the goal and ground rules; this file holds the detail so the
 prompt can stay short and this procedure can change with the code.
@@ -15,7 +15,9 @@ continue after they are resolved. Use the
 pause, and keep the [private setup-progress checkpoint](setup.md#resuming-a-paused-setup)
 so a reply or restart resumes the pending decision instead of restarting setup.
 Never override the host's mandatory approval or task-lifecycle rules. A
-confirmation wait is an incomplete checkpoint, not successful setup.
+confirmation wait is an incomplete checkpoint, not successful setup. If a form
+reports the user unavailable, do not keep calling it; use the text checkpoint
+where the host permits it.
 
 ## 1. Prepare the environment and Azure plan
 
@@ -55,7 +57,7 @@ The first decision is only tenant/subscription confirmation and new deployment
 versus reuse. A reply such as `New deployment; confirmed` or `Reuse; confirmed`
 authorizes read-only feasibility only, **not** resource creation or roles.
 Read-only identity/provider/model/quota/pricing/RBAC checks may run before this
-choice against the displayed subscription. Do not enumerate other
+choice against the displayed subscription, subject to host tool approval. Do not enumerate other
 subscriptions or assume results carry over after a scope change. If the user
 already gave an unambiguous scope and path, reuse it instead of asking again.
 Use supported commands from the installed `az` version; for gaps, `az rest` may
@@ -137,7 +139,9 @@ checksum, provenance and compatibility before extraction. GitHub source
 archives and npm tarballs are not dependency-complete bundles. Keep the bundle
 at a persistent path and use its launcher, bundled Node and `configure-client`
 helper; do not run `npm install` inside it. If no route works, checkpoint
-installation as blocked for a later explicit retry.
+installation as blocked for a later explicit retry. If the release lacks a
+compatible asset or verification fails, stop with the precise blocker; do not
+choose an older release silently.
 
 ### Register at user scope
 
@@ -159,7 +163,9 @@ Keep personal configuration outside source control. Register at the host's
   Configuration**); do not commit personal settings in `.vscode/mcp.json`.
 - **Copilot CLI:** generate the entry with the installed `configure-client.mjs`
   helper (or the bundle's `configure-client` launcher), then merge only that
-  entry into `~/.copilot/mcp-config.json` or use `/mcp add`. A session-local
+  entry into `~/.copilot/mcp-config.json` or use `/mcp add`. The helper refuses
+  to overwrite, so write it to a new private temporary file and merge only the
+  `image-gen` entry. A session-local
   `--additional-mcp-config` file remains available if the user prefers it.
 
 ### Activate and verify
@@ -192,8 +198,11 @@ submission and generate once with the configured deployment. Do not retry,
 edit, switch models or submit again automatically. If the outcome or transport
 is uncertain, call `get_operation` with the same UUID. On success, inspect the
 saved full-resolution PNG with a local image-reading tool if available and
-show its path; if you cannot inspect it, say so.
+show its path; if you cannot inspect it, say so and do not claim visual quality.
 
 Finish with the installed version, configured host and scope, private
 configuration/state paths, verification results and remaining limitations.
+At user scope, note that the billable tools are available in every project for
+that user, and give the host's removal command (for Claude Code,
+`claude mcp remove --scope user image-gen`).
 Never describe a blocked or unverified step as completed.

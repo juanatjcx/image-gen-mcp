@@ -1,6 +1,6 @@
 # Copilot, Claude Code and filesystem boundaries
 
-Start with the [single copyable setup prompt](../README.md#get-started). Install the
+Start with the [single setup prompt](../README.md#get-started), sent as your message. Install the
 pinned published runtime as in the README, or build a source checkout. For
 registry installs, use the absolute entrypoint
 `/YOUR/PREFIX/node_modules/@juanmicrosoft/image-gen-mcp/dist/cli.js` in place of
@@ -31,7 +31,7 @@ For Claude Code, replace the command after `--` with the bundle launcher alone.
   Claude Sonnet 5, so this does not isolate the cause or qualify every host
   model. Do not regenerate to fix a failed host image request.
 
-## Copilot CLI: private session-local setup
+## Copilot CLI: session-local or user setup
 
 After setting runtime environment variables as in [setup](setup.md), the
 published package includes the Copilot-specific helper:
@@ -61,6 +61,9 @@ give the user a launch command with the actual private config path:
 ```sh
 copilot --resume --additional-mcp-config "@$HOME/.config/image-gen-mcp/copilot.mcp.json"
 ```
+
+If the entry was merged into the user `~/.copilot/mcp-config.json` instead,
+relaunch with `copilot --resume` and no `--additional-mcp-config` flag.
 
 `--resume` offers session selection; use `--resume=SESSION_ID` when the correct
 ID is known. Check installed `copilot --help` if options differ. The user should
@@ -98,7 +101,9 @@ claude mcp get image-gen
 
 `--scope user` stores the entry in your private user configuration and makes it
 available across projects; it never writes a shared `.mcp.json`. To limit the
-server to the current project only, use `--scope local` instead. Inspect
+server to the current project only, use `--scope local` instead. At user scope
+the billable image tools are offered in every project; remove the entry with
+`claude mcp remove --scope user image-gen`. Inspect
 `claude mcp list` first and stop if `image-gen` already exists. Confirm environment variables are populated before running the command.
 Unset `AZURE_OPENAI_API_KEY` in the launch environment when using CLI auth.
 If selected, add `--env "AZURE_TENANT_ID=$AZURE_TENANT_ID"` and, for an isolated

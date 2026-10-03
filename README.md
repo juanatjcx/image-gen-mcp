@@ -42,7 +42,7 @@ fallback. No exact ChatGPT backend or output parity is claimed.
 
 **Let your coding agent do the setup.** Use Copilot CLI, VS Code Copilot in a
 local agent session, or Claude Code on the machine where the MCP will run.
-Paste the single prompt below. No Azure portal configuration is needed:
+Send the single prompt below as your message. No Azure portal configuration is needed:
 the agent uses Azure CLI and this repository's provisioning script.
 You still complete interactive sign-in and approve subscription, resource costs
 and permissions. A subscription with model access/quota is required; an agent
@@ -67,12 +67,12 @@ on this machine, end to end: provision (or reuse) an Azure image deployment with
 Azure CLI, install the server, and register it globally (user scope) in this
 coding agent.
 
-Clone the repository to a private temporary directory and follow
+Clone the repository to a private persistent directory and follow
 docs/agent-setup.md, which links the other guides you need.
 
 Ground rules:
 - Read-only checks (tool versions, az account show, providers, quota, pricing,
-  RBAC) need no approval. Never ask me to paste credentials; let me run sign-in.
+  RBAC) need no Azure write approval; follow this host's tool-approval policy. Never ask me to paste credentials; let me run sign-in.
 - Before creating any Azure resource, registering a provider or assigning a
   role, show me one plan (tenant/subscription, region, model, resource names,
   estimated cost, role and scope) and wait for my explicit approval of it.
