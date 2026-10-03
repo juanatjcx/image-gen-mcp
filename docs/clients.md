@@ -114,8 +114,9 @@ from the server command. Resolve `node` to an absolute path if the host PATH
 differs; Azure CLI must also be reachable by the server.
 
 Exit and restart `claude` (`claude --continue` resumes the last conversation),
-inspect `/mcp`, and ask it to discover the four tools and call only `get_capabilities`. Approve tools deliberately; neither
-registration nor diagnostics proves inference access. Do not copy the
+inspect `/mcp`, and ask it to discover the four tools and call only
+`get_capabilities`. Approve tools deliberately; neither registration nor
+diagnostics proves inference access. Do not copy the
 Copilot-specific `tools`/`timeout` properties into Claude's configuration.
 If a long-running image call is interrupted, retain its UUID and recover with
 `get_operation`; never treat a host timeout as permission to resubmit.
