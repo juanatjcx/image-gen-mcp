@@ -72,11 +72,13 @@ docs/agent-setup.md, which links the other guides you need.
 
 Ground rules:
 - Read-only checks (tool versions, az account show, providers, quota, pricing,
-  RBAC) need no Azure write approval; follow this host's tool-approval policy. Never ask me to paste credentials; let me run sign-in.
+  RBAC) need no Azure write approval (host tool approval still applies).
+  Never ask me to paste credentials; let me run sign-in.
 - Before creating any Azure resource, registering a provider or assigning a
   role, show me one plan (tenant/subscription, region, model, resource names,
   estimated cost, role and scope) and wait for my explicit approval of it.
-- Use Azure CLI auth (no API keys) and the repository's scripts/azure.mjs.
+- Use Azure CLI auth (no API keys) and, for a new deployment, the
+  repository's scripts/azure.mjs.
 - Install one pinned version (no @latest in the launcher) and add the server
   without overwriting other MCP servers; stop on a name conflict.
 - If I need to sign in, choose, approve or restart, stop and tell me exactly

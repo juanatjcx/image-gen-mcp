@@ -45,8 +45,8 @@ copilot --additional-mcp-config "@$HOME/.config/image-gen-mcp/copilot.mcp.json"
 This assumes the README installation prefix. The helper refuses to overwrite
 an existing file; inspect it rather than deleting it blindly. Use `/mcp` to
 inspect the server and ask for `get_capabilities`, not an automatic paid test.
-For deliberate persistent registration, use `/mcp add` or merge the entry into
-the user configuration. Preserve other servers and tool-approval settings.
+For persistent registration, which is the default for the prompt-driven setup,
+use `/mcp add` or merge the entry into the user configuration. Preserve other servers and tool-approval settings.
 For the prompt-first CLI-auth path, set `IMAGE_GEN_PREVIEW=false` and unset
 `AZURE_OPENAI_API_KEY` before running the helper. Explicitly add an isolated
 `AZURE_CONFIG_DIR` to the private server `env` if used; the helper does not copy it.
@@ -113,8 +113,8 @@ Do not put keys/tokens in command arguments. The final `--` separates host optio
 from the server command. Resolve `node` to an absolute path if the host PATH
 differs; Azure CLI must also be reachable by the server.
 
-Start/restart `claude`, inspect `/mcp`, and ask it to discover the
-four tools and call only `get_capabilities`. Approve tools deliberately; neither
+Exit and restart `claude` (`claude --continue` resumes the last conversation),
+inspect `/mcp`, and ask it to discover the four tools and call only `get_capabilities`. Approve tools deliberately; neither
 registration nor diagnostics proves inference access. Do not copy the
 Copilot-specific `tools`/`timeout` properties into Claude's configuration.
 If a long-running image call is interrupted, retain its UUID and recover with

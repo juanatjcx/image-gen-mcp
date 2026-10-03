@@ -165,7 +165,8 @@ Keep personal configuration outside source control. Register at the host's
   helper (or the bundle's `configure-client` launcher), then merge only that
   entry into `~/.copilot/mcp-config.json` or use `/mcp add`. The helper refuses
   to overwrite, so write it to a new private temporary file and merge only the
-  `image-gen` entry. A session-local
+  `image-gen` entry; delete that temporary file once the merge is verified.
+  A session-local
   `--additional-mcp-config` file remains available if the user prefers it.
 
 ### Activate and verify
@@ -173,7 +174,10 @@ Keep personal configuration outside source control. Register at the host's
 Reload or restart the host as needed and show the exact step; do not assume
 the running agent can reload its own tool inventory. Checkpoint as awaiting
 restart, using the [client restart template](setup.md#client-restart) and the
-[resume guidance](clients.md#activate-in-a-new-process-and-resume). In the
+[Copilot resume guidance](clients.md#activate-in-a-new-process-and-resume).
+For Claude Code, ask the user to exit and run `claude --continue` (or start
+`claude`), then inspect `/mcp`; see
+[Claude Code registration](clients.md#claude-code-stdio-registration). In the
 resumed host, read the checkpoint and continue discovery rather than
 reprovisioning or repeating configuration.
 
